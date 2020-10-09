@@ -3,49 +3,61 @@ import {View, FlatList, StyleSheet, Text} from 'react-native';
 import {COLORS} from './Styles.js';
 import {getImage} from './ImageUtils';
 
-
 const App: () => React$Node = () => {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [data, setData] = useState([]);
+
+  const API_ENDPOINT = 'https://filelist.io/api.php?username=mertzzz&passkey=6b7178d18dca405246d7a8d90d7996c3&action=latest-torrents'
+
   useEffect(() => {
-    fetch(
-      'https://filelist.io/api.php?username=mertzzz&passkey=6b7178d18dca405246d7a8d90d7996c3&action=latest-torrents',
-    )
+    setIsLoading(true);
+    fetch(API_ENDPOINT)
       .then((res) => res.json())
       .then((resJson) => {
+        console.log(resJson);
         setData(data.concat(resJson));
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setIsLoading(false);
+        setError(err);
       });
-  });
+  }, []);
 
   return (
-      <View style={styles.v_container}>
-        <FlatList
-          style={styles.container}
-          data={data}
-          keyExtractor={(item, index) => index}
-          renderItem={({item}) => (
-            <View style={styles.row}>
-              <View style={styles.row_cell}>
-                <Text style={styles.row_time}>{item.upload_date}</Text>
-                <Text numberOfLines={2} style={styles.row_name}>
-                  {item.name}
-                </Text>
-              </View>
-              {getImage(item.category)}
+      <FlatList
+        style={styles.container}
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+
+        renderItem={({item}) => (
+          <View style={styles.row}>
+            <View style={styles.row_cell}>
+              <Text style={styles.row_time}>{item.upload_date}</Text>
+              <Text numberOfLines={2} style={styles.row_name}>{item.name}
+              </Text>
             </View>
-          )}
-        />
-      </View>
+            {getImage(item.category)}
+          </View>
+        )}
+      />
   );
 };
 
 const styles = StyleSheet.create({
-  v_container: {
+  // v_container: {
+  //   padding: 8,
+  //   flexDirection: 'column',
+  //   alignItems: 'center',
+  //   backgroundColor: COLORS.background_dark,
+  // },
+  container: {
     padding: 8,
     flexDirection: 'column',
-    alignItems: 'center',
+    // alignItems: 'center',
     backgroundColor: COLORS.background_dark,
-  },
-  container: {
     alignSelf: 'stretch',
   },
   row: {
