@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.7.6",
+    "@react-navigation/stack": "^5.9.3",
     "metro-react-native-babel-transformer": "^0.63.0",
     "react": "16.13.1",
     "react-native": "0.63.3",
@@ -19,7 +20,9 @@
     "react-native-reanimated": "^1.13.1",
     "react-native-safe-area-context": "^3.1.8",
     "react-native-screens": "^2.11.0",
-    "react-navigation-stack": "^2.8.4"
+    "react-navigation": "^4.4.2",
+    "react-navigation-stack": "^2.8.4",
+    "typescript": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
