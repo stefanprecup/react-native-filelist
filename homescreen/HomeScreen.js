@@ -2,47 +2,71 @@ import React, {useState, useEffect} from 'react';
 import {View, FlatList, StyleSheet, Text} from 'react-native';
 import {COLORS} from '../Styles.js';
 import {getImage} from '../homescreen/HomeScreenImageUtils';
+import {SearchBar} from 'react-native-elements';
 
 export const HomeScreen: () => React$Node = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
+  const [search, setSearch] = useState('');
 
   const API_ENDPOINT =
     'https://filelist.io/api.php?username=mertzzz&passkey=6b7178d18dca405246d7a8d90d7996c3&action=latest-torrents';
 
   useEffect(() => {
-    setIsLoading(true);
     fetch(API_ENDPOINT)
       .then((res) => res.json())
       .then((resJson) => {
         console.log(resJson);
         setData(data.concat(resJson));
-        setIsLoading(false);
       })
       .catch((err) => {
-        setIsLoading(false);
         setError(err);
       });
   }, []);
 
-  return (
-    <FlatList
-      style={styles.container}
-      data={data}
-      keyExtractor={(item) => item.id}
-      renderItem={({item}) => (
+  const SearchBarView = () => {
+    return (
+      <SearchBar
+        round
+        searchIcon={{size: 24}}
+        onChangeText={(text) => setSearch(text)}
+        onClear={(text) => setSearch('')}
+        placeholder="Type Here..."
+        value={search}
+      />
+    );
+  };
+
+  const FlatListView = () => {
+    return (
+      <FlatList
+        style={styles.container}
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={FlatListItemView}
+      />
+    );
+  };
+
+  const FlatListItemView = ({ item }) => {
+    return (
         <View style={styles.row}>
-          <View style={styles.row_cell}>
-            <Text style={styles.row_time}>{item.upload_date}</Text>
-            <Text numberOfLines={2} style={styles.row_name}>
-              {item.name}
-            </Text>
-          </View>
-          {getImage(item.category)}
+        <View style={styles.row_cell}>
+          <Text style={styles.row_time}>{item.upload_date}</Text>
+          <Text numberOfLines={2} style={styles.row_name}>
+            {item.name}
+          </Text>
         </View>
-      )}
-    />
+        {getImage(item.category)}
+      </View>
+    );
+  };
+
+  return (
+    <>
+      <SearchBarView></SearchBarView>
+      <FlatListView></FlatListView>
+    </>
   );
 };
 
