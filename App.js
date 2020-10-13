@@ -6,35 +6,59 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-const Stack = createStackNavigator();
+const TorrentsStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function BotttomTabs() {
+function ProfileStackScreen() {
   return (
-    <Tab.Navigator tabBarOptions={{
-      labelStyle: {
-        fontSize: 16,
-        fontWeight: 'bold'
-      },
-      style: {
-        backgroundColor: '#e5e6e8'
-      }
-    }}>
-      <Tab.Screen name={'Home'} component={HomeScreen} />
-      <Tab.Screen name={'Profile'} component={ProfileScreen} options={{
-          
-      }} />
-    </Tab.Navigator>
-  );
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name={'Profile'}
+        component={ProfileScreen}
+        options={{ title: 'Profile' }}
+      />
+    </ProfileStack.Navigator>
+  )
+}
+
+function HomeStackScreen() {
+  return (
+    <TorrentsStack.Navigator>
+      <TorrentsStack.Screen
+        name={'Torrents'}
+        component={HomeScreen}
+        options={{ title: 'Torrents' }}
+      />
+    </TorrentsStack.Navigator>
+  )
 }
 
 const App: () => React$Node = () => {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={BotttomTabs} />
-        </Stack.Navigator>
+        <Tab.Navigator
+          tabBarOptions={{
+            labelStyle: {
+              fontSize: 16,
+              fontWeight: 'bold',
+            },
+            style: {
+              backgroundColor: '#e5e6e8',
+            },
+          }}>
+          <Tab.Screen
+            name={'Torrents'}
+            component={HomeStackScreen}
+            options={{title: 'Torrents'}}
+          />
+          <Tab.Screen
+            name={'Profile'}
+            component={ProfileStackScreen}
+            options={{title: 'Profile'}}
+          />
+        </Tab.Navigator>
       </NavigationContainer>
     </>
   );
