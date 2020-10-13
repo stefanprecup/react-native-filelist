@@ -30,7 +30,7 @@ export const HomeScreen: () => React$Node = () => {
     <FlatList
       style={styles.container}
       data={data}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}
       renderItem={({item}) => (
         <View style={styles.row}>
           <View style={styles.row_cell}>
