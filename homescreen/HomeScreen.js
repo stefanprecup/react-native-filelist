@@ -1,10 +1,53 @@
 import React, {useState, useEffect} from 'react';
-import {View, FlatList, StyleSheet, Text} from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Button,
+  Text,
+} from 'react-native';
 import {COLORS} from '../Styles.js';
 import {getImage} from '../homescreen/HomeScreenImageUtils';
 import {SearchBar} from 'react-native-elements';
+import {createStackNavigator} from '@react-navigation/stack';
 
-export const HomeScreen: () => React$Node = () => {
+const Stack = createStackNavigator();
+
+export const HomeScreen = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Details" component={Details} />
+    </Stack.Navigator>
+  );
+};
+
+function Details({route, navigation}) {
+  /* 2. Get the param */
+  const {itemId} = route.params;
+  const {otherParam} = route.params;
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Details Screen</Text>
+      <Text>itemId: {JSON.stringify(itemId)}</Text>
+      <Text>otherParam: {JSON.stringify(otherParam)}</Text>
+      <Button
+        title="Go to Details... again"
+        onPress={() =>
+          navigation.push('Details', {
+            itemId: Math.floor(Math.random() * 100),
+          })
+        }
+      />
+      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
+      <Button title="Go back" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+const Home = ({navigation}) => {
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
@@ -17,55 +60,81 @@ export const HomeScreen: () => React$Node = () => {
       .then((res) => res.json())
       .then((resJson) => {
         console.log(resJson);
+        setFilteredDataSource(resJson);
         setData(data.concat(resJson));
       })
       .catch((err) => {
-        setError(err);
+        console.error(error);
       });
   }, []);
 
-  const SearchBarView = () => {
+  const searchFilterFunction = (text) => {
+    if (text) {
+      const newData = data.filter(function (item) {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearch(text);
+    } else {
+      setFilteredDataSource(data);
+      setSearch(text);
+    }
+  };
+
+  const searchBarView = () => {
     return (
       <SearchBar
+        lightTheme
         round
         searchIcon={{size: 24}}
-        onChangeText={(text) => setSearch(text)}
-        onClear={(text) => setSearch('')}
+        onChangeText={(text) => searchFilterFunction(text)}
+        onClear={(text) => searchFilterFunction('')}
         placeholder="Type Here..."
         value={search}
       />
     );
   };
 
-  const FlatListView = () => {
+  const flatListView = () => {
     return (
       <FlatList
         style={styles.container}
-        data={data}
+        data={filteredDataSource}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={FlatListItemView}
+        renderItem={flatListItemView}
       />
     );
   };
 
-  const FlatListItemView = ({ item }) => {
+  const flatListItemView = ({item}) => {
     return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          /* 1. Navigate to the Details route with params */
+          navigation.navigate('Details', {
+            itemId: 86,
+            otherParam: 'anything you want here',
+          });
+        }}>
         <View style={styles.row}>
-        <View style={styles.row_cell}>
-          <Text style={styles.row_time}>{item.upload_date}</Text>
-          <Text numberOfLines={2} style={styles.row_name}>
-            {item.name}
-          </Text>
+          <View style={styles.row_cell}>
+            <Text style={styles.row_time}>{item.upload_date}</Text>
+            <Text numberOfLines={2} style={styles.row_name}>
+              {item.name}
+            </Text>
+          </View>
+          {getImage(item.category)}
         </View>
-        {getImage(item.category)}
-      </View>
+      </TouchableWithoutFeedback>
     );
   };
 
   return (
     <>
-      <SearchBarView></SearchBarView>
-      <FlatListView></FlatListView>
+      {searchBarView()}
+      {flatListView()}
     </>
   );
 };

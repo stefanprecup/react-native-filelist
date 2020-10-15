@@ -34,7 +34,7 @@ function HomeStackScreen() {
   )
 }
 
-const App: () => React$Node = () => {
+const App = () => {
   return (
     <>
       <NavigationContainer>
