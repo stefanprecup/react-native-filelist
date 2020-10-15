@@ -4,49 +4,13 @@ import {
   FlatList,
   StyleSheet,
   TouchableWithoutFeedback,
-  Button,
   Text,
 } from 'react-native';
 import {COLORS} from '../Styles.js';
 import {getImage} from '../homescreen/HomeScreenImageUtils';
 import {SearchBar} from 'react-native-elements';
-import {createStackNavigator} from '@react-navigation/stack';
 
-const Stack = createStackNavigator();
-
-export const HomeScreen = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Details" component={Details} />
-    </Stack.Navigator>
-  );
-};
-
-function Details({route, navigation}) {
-  /* 2. Get the param */
-  const {itemId} = route.params;
-  const {otherParam} = route.params;
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-      <Text>itemId: {JSON.stringify(itemId)}</Text>
-      <Text>otherParam: {JSON.stringify(otherParam)}</Text>
-      <Button
-        title="Go to Details... again"
-        onPress={() =>
-          navigation.push('Details', {
-            itemId: Math.floor(Math.random() * 100),
-          })
-        }
-      />
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-      <Button title="Go back" onPress={() => navigation.goBack()} />
-    </View>
-  );
-}
-
-const Home = ({navigation}) => {
+export const Home = ({navigation}) => {
   const [filteredDataSource, setFilteredDataSource] = useState([]);
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
@@ -114,8 +78,7 @@ const Home = ({navigation}) => {
         onPress={() => {
           /* 1. Navigate to the Details route with params */
           navigation.navigate('Details', {
-            itemId: 86,
-            otherParam: 'anything you want here',
+            item: item
           });
         }}>
         <View style={styles.row}>

@@ -1,13 +1,15 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {HomeScreen} from './homescreen/HomeScreen';
+import {Home} from './homescreen/HomeScreen';
 import {ProfileScreen} from './profilescreen/ProfileScreen';
+import {DetailScreen} from './detailscreen/DetailScreen'
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 const TorrentsStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
+const DetailStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function ProfileStackScreen() {
@@ -16,10 +18,10 @@ function ProfileStackScreen() {
       <ProfileStack.Screen
         name={'Profile'}
         component={ProfileScreen}
-        options={{ title: 'Profile' }}
+        options={{title: 'Profile'}}
       />
     </ProfileStack.Navigator>
-  )
+  );
 }
 
 function HomeStackScreen() {
@@ -27,11 +29,20 @@ function HomeStackScreen() {
     <TorrentsStack.Navigator>
       <TorrentsStack.Screen
         name={'Torrents'}
-        component={HomeScreen}
-        options={{ title: 'Torrents' }}
+        component={HomeScreenStack}
+        options={{title: 'Torrents'}}
       />
     </TorrentsStack.Navigator>
-  )
+  );
+}
+
+function HomeScreenStack() {
+  return (
+    <DetailStack.Navigator>
+      <DetailStack.Screen name="Home" component={Home} />
+      <DetailStack.Screen name="Details" component={DetailScreen} />
+    </DetailStack.Navigator>
+  );
 }
 
 const App = () => {
