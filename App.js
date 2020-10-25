@@ -6,7 +6,8 @@ import {DetailScreen} from './detailscreen/DetailScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
+import {HeaderBackButton} from '@react-navigation/stack';
 
 const TorrentsStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
@@ -20,6 +21,21 @@ function getHeaderTitle(route) {
       return 'Torrents';
     case 'Details':
       return 'Torrent detail';
+  }
+}
+
+function setBackButton(navigation, route) {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Feed';
+  switch (routeName) {
+    case 'Home':
+      return null;
+    case 'Details':
+      return (
+        <HeaderBackButton
+          onPress={() => navigation.navigate('Home')}
+          title="Info"
+          color="#fff"></HeaderBackButton>
+      );
   }
 }
 
@@ -47,17 +63,20 @@ function HomeStackContainer() {
   );
 }
 
-function HomeScreenStack({ navigation, route }) {
+function HomeScreenStack({navigation, route}) {
   React.useLayoutEffect(() => {
-    navigation.setOptions({ headerTitle: getHeaderTitle(route) });
+    navigation.setOptions({
+      headerLeft: () => setBackButton(navigation, route),
+      headerTitle: getHeaderTitle(route),
+    });
   }, [navigation, route]);
   return (
     <DetailStack.Navigator>
       <DetailStack.Screen name="Home" component={Home} />
       <DetailStack.Screen
-        name={"Details"}
+        name={'Details'}
         component={DetailScreen}
-        options={{title: 'Torrent detail'}}
+        options={{title: 'Torrent detail', headerLeft: null}}
       />
     </DetailStack.Navigator>
   );
