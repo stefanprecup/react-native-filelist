@@ -3,7 +3,6 @@ import {View, Text, StyleSheet, Linking} from 'react-native';
 import {COLORS} from '../Styles.js';
 
 export const DetailScreen = ({route}) => {
-  /* 2. Get the param */
   const {item} = route.params;
   return (
     <View style={styles.container}>
