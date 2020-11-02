@@ -9,6 +9,7 @@ import {
 import {COLORS} from '../Styles.js';
 import {getImage} from '../homescreen/HomeScreenImageUtils';
 import {SearchBar} from 'react-native-elements';
+import {ServicesServiceProvider} from '../lib/api';
 
 export const Home = ({navigation}) => {
   const [filteredDataSource, setFilteredDataSource] = useState([]);
@@ -19,18 +20,31 @@ export const Home = ({navigation}) => {
   const API_ENDPOINT =
     'https://filelist.io/api.php?username=mertzzz&passkey=6b7178d18dca405246d7a8d90d7996c3&action=latest-torrents';
 
+  const servicesServiceProvider = ServicesServiceProvider()
+
   useEffect(() => {
-    fetch(API_ENDPOINT)
-      .then((res) => res.json())
+    // fetch(API_ENDPOINT)
+    //   .then((res) => res.json())
+    //   .then((resJson) => {
+    //     console.log(resJson);
+    //     setFilteredDataSource(resJson);
+    //     setData(data.concat(resJson));
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
+
+    return servicesServiceProvider
+      .getServices()
       .then((resJson) => {
         console.log(resJson);
         setFilteredDataSource(resJson);
         setData(data.concat(resJson));
       })
-      .catch((err) => {
+      .catch(() => {
         console.error(error);
       });
-  }, []);
+  },[]);
 
   const searchFilterFunction = (text) => {
     if (text) {
@@ -78,7 +92,7 @@ export const Home = ({navigation}) => {
         onPress={() => {
           /* 1. Navigate to the Details route with params */
           navigation.navigate('Details', {
-            item: item
+            item: item,
           });
         }}>
         <View style={styles.row}>
