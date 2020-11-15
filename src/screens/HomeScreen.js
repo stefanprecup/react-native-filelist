@@ -1,129 +1,144 @@
-import 'react-native-gesture-handler';
-import React, { useContext } from 'react';
-import {StyleSheet } from 'react-native';
-import { AuthContext } from '../navigation/AuthProvider';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Text,
+} from 'react-native';
+import {COLORS} from '../utils/Styles';
+import {getImage} from '../utils/HomeScreenImageUtils';
+import {SearchBar} from 'react-native-elements';
+import ServicesServiceProvider from '../api/ServicesServiceProvider';
 
-import {Home} from '../../homescreen/HomeScreen'
-import {ProfileScreen} from '../screens/ProfileScreen';
-import {DetailScreen} from '../screens/DetailScreen';
-import {createStackNavigator} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
-import {HeaderBackButton} from '@react-navigation/stack';
+export const Home = ({navigation}) => {
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState([]);
+  const [search, setSearch] = useState('');
 
-const TorrentsStack = createStackNavigator();
-const ProfileStack = createStackNavigator();
-const DetailStack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+  const servicesServiceProvider = ServicesServiceProvider()
 
-export default function HomeScreen() {
-  const { user, logout } = useContext(AuthContext);
+  useEffect(() => {
+
+    return servicesServiceProvider
+      .getServices()
+      .then((resJson) => {
+        console.log(resJson);
+        setFilteredDataSource(resJson);
+        setData(data.concat(resJson));
+      })
+      .catch(() => {
+        console.error(error);
+      });
+  },[]);
+
+  const searchFilterFunction = (text) => {
+    if (text) {
+      const newData = data.filter(function (item) {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearch(text);
+    } else {
+      setFilteredDataSource(data);
+      setSearch(text);
+    }
+  };
+
+  const searchBarView = () => {
+    return (
+      <SearchBar
+        lightTheme
+        round
+        searchIcon={{size: 24}}
+        onChangeText={(text) => searchFilterFunction(text)}
+        onClear={(text) => searchFilterFunction('')}
+        placeholder="Type Here..."
+        value={search}
+      />
+    );
+  };
+
+  const flatListView = () => {
+    return (
+      <FlatList
+        style={styles.container}
+        data={filteredDataSource}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={flatListItemView}
+      />
+    );
+  };
+
+  const flatListItemView = ({item}) => {
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          /* 1. Navigate to the Details route with params */
+          navigation.navigate('Details', {
+            item: item,
+          });
+        }}>
+        <View style={styles.row}>
+          <View style={styles.row_cell}>
+            <Text style={styles.row_time}>{item.upload_date}</Text>
+            <Text numberOfLines={2} style={styles.row_name}>
+              {item.name}
+            </Text>
+          </View>
+          {getImage(item.category)}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   return (
     <>
-        <Tab.Navigator
-          tabBarOptions={{
-            labelStyle: {
-              fontSize: 16,
-              fontWeight: 'bold',
-            },
-            style: {
-              backgroundColor: '#e5e6e8',
-            },
-          }}>
-          <Tab.Screen
-            name={'Torrents'}
-            component={HomeStackContainer}
-            options={{title: 'Torrents'}}
-          />
-          <Tab.Screen
-            name={'Profile'}
-            component={ProfileStackScreen}
-            options={{title: 'Profile'}}
-          />
-        </Tab.Navigator>
+      {searchBarView()}
+      {flatListView()}
     </>
   );
-}
-
-function getHeaderTitle(route) {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Feed';
-  console.log("route name " + routeName);
-  switch (routeName) {
-    case 'Home':
-      return 'Torrents';
-    case 'Details':
-      return 'Torrent detail';
-  }
-}
-
-function setBackButton(navigation, route) {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Feed';
-  console.log("back button route name " + routeName);
-  switch (routeName) {
-    case 'Home':
-      return null;
-    case 'Details':
-      return (
-        <HeaderBackButton
-          onPress={() => navigation.navigate('Home')}
-          title="Info"
-          color="#fff"></HeaderBackButton>
-      );
-  }
-}
-
-function ProfileStackScreen() {
-  return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Screen
-        name={'Profile'}
-        component={ProfileScreen}
-        options={{title: 'Profile'}}
-      />
-    </ProfileStack.Navigator>
-  );
-}
-
-function HomeStackContainer() {
-  return (
-    <TorrentsStack.Navigator>
-      <TorrentsStack.Screen
-        name={'Torrents'}
-        component={HomeScreenStack}
-        options={{title: 'Torrents'}}
-      />
-    </TorrentsStack.Navigator>
-  );
-}
-
-function HomeScreenStack({navigation, route}) {
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => setBackButton(navigation, route),
-      headerTitle: getHeaderTitle(route),
-    });
-  }, [navigation, route]);
-  return (
-    <DetailStack.Navigator>
-      <DetailStack.Screen name="Home" component={Home} />
-      <DetailStack.Screen
-        name={'Details'}
-        component={DetailScreen}
-        options={{title: 'Torrent detail', headerLeft: null}}
-      />
-    </DetailStack.Navigator>
-  );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f1'
+    padding: 8,
+    flexDirection: 'column',
+    backgroundColor: COLORS.background_dark,
+    alignSelf: 'stretch',
   },
-  text: {
-    fontSize: 20,
-    color: '#333333'
-  }
+  row: {
+    marginTop: 10,
+    elevation: 1,
+    borderRadius: 2,
+    backgroundColor: COLORS.secondary,
+    flex: 1,
+    flexDirection: 'row',
+  },
+  row_cell: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  row_time: {
+    paddingTop: 5,
+    paddingLeft: 5,
+    color: COLORS.text_light,
+    textAlignVertical: 'bottom',
+    includeFontPadding: false,
+    flex: 0,
+    fontSize: 12,
+  },
+  row_name: {
+    paddingBottom: 5,
+    paddingLeft: 5,
+    paddingRight: 15,
+    color: COLORS.text_light,
+    textAlignVertical: 'top',
+    includeFontPadding: false,
+    flex: 0,
+    fontSize: 18,
+  },
 });
