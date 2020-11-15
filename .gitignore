@@ -173,3 +173,5 @@ metro.config.js
 package-lock.json
 
 yarn.lock
+
+ios/newFilelist.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist

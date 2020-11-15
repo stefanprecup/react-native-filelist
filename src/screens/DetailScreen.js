@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, Linking} from 'react-native';
-import {COLORS} from '../Styles.js';
+import {COLORS} from '../utils/Styles.js';
 
 export const DetailScreen = ({route}) => {
   const {item} = route.params;

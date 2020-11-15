@@ -6,10 +6,10 @@ import {
   TouchableWithoutFeedback,
   Text,
 } from 'react-native';
-import {COLORS} from '../Styles.js';
-import {getImage} from '../homescreen/HomeScreenImageUtils';
+import {COLORS} from '../src/utils/Styles.js';
+import {getImage} from '../src/utils/HomeScreenImageUtils';
 import {SearchBar} from 'react-native-elements';
-import {ServicesServiceProvider} from '../lib/api';
+import ServicesServiceProvider from '../src/api/ServicesServiceProvider';
 
 export const Home = ({navigation}) => {
   const [filteredDataSource, setFilteredDataSource] = useState([]);
@@ -23,16 +23,6 @@ export const Home = ({navigation}) => {
   const servicesServiceProvider = ServicesServiceProvider()
 
   useEffect(() => {
-    // fetch(API_ENDPOINT)
-    //   .then((res) => res.json())
-    //   .then((resJson) => {
-    //     console.log(resJson);
-    //     setFilteredDataSource(resJson);
-    //     setData(data.concat(resJson));
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
 
     return servicesServiceProvider
       .getServices()
