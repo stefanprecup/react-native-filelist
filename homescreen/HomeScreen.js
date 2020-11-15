@@ -17,9 +17,6 @@ export const Home = ({navigation}) => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
 
-  const API_ENDPOINT =
-    'https://filelist.io/api.php?username=mertzzz&passkey=6b7178d18dca405246d7a8d90d7996c3&action=latest-torrents';
-
   const servicesServiceProvider = ServicesServiceProvider()
 
   useEffect(() => {
